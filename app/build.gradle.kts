@@ -38,7 +38,7 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15"
-    } 
+    }
 }
 
 dependencies {
@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.datastore.core.android)
+    implementation(libs.androidx.compose.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -78,4 +79,6 @@ dependencies {
     implementation("com.google.accompanist:accompanist-navigation-animation:0.36.0")
 
     implementation("androidx.compose.material:material-icons-extended")
+
+    implementation("io.coil-kt:coil-compose:2.7.0")
 }

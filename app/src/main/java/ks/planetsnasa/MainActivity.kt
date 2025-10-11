@@ -11,6 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import ks.planetsnasa.ui.list.PlanetListScreen
+import ks.planetsnasa.ui.list.PlanetListViewModel
 import ks.planetsnasa.ui.theme.PlanetsNASATheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +22,18 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PlanetsNASATheme {
+                val vm: PlanetListViewModel = viewModel()
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    PlanetListScreen(
+                        viewModel = vm,
+                        onPlanetClick = { planetId ->
+                            // TODO: навигация на детальный экран (пока можно просто логировать)
+                            // Log.d("Main", "Clicked: $planetId")
+                        },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PlanetsNASATheme {
-        Greeting("Android")
     }
 }
