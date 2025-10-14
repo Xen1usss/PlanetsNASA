@@ -2,11 +2,13 @@ package ks.planetsnasa.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ks.planetsnasa.data.PlanetRepository
 import ks.planetsnasa.ui.model.PlanetUiModel
+import javax.inject.Inject
 
 sealed interface PlanetListState {
     data object Loading : PlanetListState
@@ -14,8 +16,8 @@ sealed interface PlanetListState {
     data object Empty : PlanetListState
     data class Error(val message: String) : PlanetListState
 }
-
-class PlanetListViewModel(
+@HiltViewModel
+class PlanetListViewModel @Inject constructor(
     private val repo: PlanetRepository
 ) : ViewModel() {
 

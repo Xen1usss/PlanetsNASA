@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)          // ← Hilt plugin
+    alias(libs.plugins.kapt)          // ← KAPT
 }
 
 android {
@@ -90,4 +92,11 @@ dependencies {
     implementation("com.google.accompanist:accompanist-swiperefresh:0.36.0")
 
     implementation("androidx.compose.material:material")
+
+    implementation("com.google.dagger:hilt-android:${libs.versions.hilt.get()}")
+    kapt("com.google.dagger:hilt-compiler:${libs.versions.hilt.get()}")
+
+    // Для hiltViewModel() в Compose
+    implementation("androidx.hilt:hilt-navigation-compose:${libs.versions.hiltNavCompose.get()}")
+
 }

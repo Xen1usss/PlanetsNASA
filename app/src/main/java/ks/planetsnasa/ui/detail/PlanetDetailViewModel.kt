@@ -1,12 +1,15 @@
 package ks.planetsnasa.ui.detail
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ks.planetsnasa.data.PlanetRepository
 import ks.planetsnasa.ui.model.PlanetDetailUiModel
+import javax.inject.Inject
 
 sealed interface PlanetDetailState {
     data object Loading : PlanetDetailState
@@ -14,13 +17,16 @@ sealed interface PlanetDetailState {
     data class Error(val message: String) : PlanetDetailState
 }
 
-class PlanetDetailViewModel(
+@HiltViewModel
+class PlanetDetailViewModel @Inject constructor(
     private val repo: PlanetRepository,
-    private val nasaId: String
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<PlanetDetailState>(PlanetDetailState.Loading)
     val state: StateFlow<PlanetDetailState> = _state
+
+    private val nasaId: String = checkNotNull(savedStateHandle["nasaId"])
 
     init {
         refresh()

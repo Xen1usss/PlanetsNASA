@@ -8,17 +8,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import ks.planetsnasa.data.di.ServiceLocator
+import androidx.navigation.navArgument
+import dagger.hilt.android.AndroidEntryPoint
 import ks.planetsnasa.ui.detail.PlanetDetailScreen
 import ks.planetsnasa.ui.list.PlanetListScreen
 import ks.planetsnasa.ui.list.PlanetListViewModel
-import ks.planetsnasa.ui.list.PlanetListVmFactory
 import ks.planetsnasa.ui.theme.PlanetsNASATheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,8 +28,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PlanetsNASATheme {
-                val factory = PlanetListVmFactory(ServiceLocator.planetRepository)
-                val vm: PlanetListViewModel = viewModel(factory = factory)
                 val nav = rememberNavController()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -38,15 +38,19 @@ class MainActivity : ComponentActivity() {
                     )
                     {
                         composable("list") {
+                            val vm: PlanetListViewModel = hiltViewModel()
                             PlanetListScreen(
                                 viewModel = vm,
                                 onPlanetClick = { nasaId -> nav.navigate("detail/$nasaId") }
                             )
                         }
-                        composable("detail/{nasaId}") { backStackEntry ->
-                            val nasaId =
-                                backStackEntry.arguments?.getString("nasaId") ?: return@composable
-                            PlanetDetailScreen(nasaId = nasaId, onBack = { nav.popBackStack() })
+                        composable(
+                            route = "detail/{nasaId}",
+                            arguments = listOf(navArgument("nasaId") { type = NavType.StringType })
+                        ) {
+                            PlanetDetailScreen(
+                                onBack = { nav.popBackStack() }
+                            )
                         }
                     }
                 }

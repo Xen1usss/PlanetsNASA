@@ -11,6 +11,8 @@ composeBom = "2024.04.01"
 datastoreCoreAndroid = "1.1.7"
 roomCompiler = "2.8.0"
 runtime = "1.9.3"
+hilt = "2.52"
+hiltNavCompose = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,4 +36,6 @@ androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kapt = { id = "org.jetbrains.kotlin.kapt", version = "1.9.25" }
 

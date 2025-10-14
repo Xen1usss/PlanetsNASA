@@ -44,20 +44,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import ks.planetsnasa.data.di.ServiceLocator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlanetDetailScreen(
-    nasaId: String,
-    onBack: () -> Unit
-) {
-    val factory = PlanetDetailVmFactory(ServiceLocator.planetRepository, nasaId)
-    val vm: PlanetDetailViewModel = viewModel(factory = factory)
+fun PlanetDetailScreen(onBack: () -> Unit) {
+    val vm: PlanetDetailViewModel = hiltViewModel()
     val state by vm.state.collectAsStateWithLifecycle()
 
     when (val s = state) {
@@ -104,8 +99,22 @@ fun PlanetDetailScreen(
                             .build(),
                         contentDescription = item.title,
                         contentScale = ContentScale.Crop,
-                        loading = { Box(Modifier.fillMaxWidth().height(headerHeight).background(Color(0xFFECECEC))) },
-                        error   = { Box(Modifier.fillMaxWidth().height(headerHeight).background(Color(0xFFEEEEEE))) },
+                        loading = {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(headerHeight)
+                                    .background(Color(0xFFECECEC))
+                            )
+                        },
+                        error = {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(headerHeight)
+                                    .background(Color(0xFFEEEEEE))
+                            )
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(headerHeight)
