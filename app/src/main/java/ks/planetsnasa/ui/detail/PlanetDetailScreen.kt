@@ -11,11 +11,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -25,8 +23,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Download
@@ -38,7 +34,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -89,6 +84,14 @@ fun PlanetDetailScreen(
             val item = s.item
             val headerHeight = 320.dp
             val overlap = 24.dp
+
+            val showDesc = !item.description.isNullOrBlank() &&
+                    !item.description.equals(item.title, ignoreCase = true)
+
+            if (showDesc) {
+                Spacer(Modifier.height(16.dp))
+                Text(text = item.description!!, style = MaterialTheme.typography.bodyLarge)
+            }
 
             Box(Modifier.fillMaxSize()) {
 
@@ -176,14 +179,14 @@ fun PlanetDetailScreen(
                         navigationIconContentColor = Color.White,
                         actionIconContentColor = Color.White
                     ),
-                    modifier = Modifier.statusBarsPadding()
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .height(56.dp)
                 )
             }
         }
     }
 }
-
-// --- helpers ---
 
 private fun share(ctx: Context, title: String, url: String) {
     val intent = Intent(Intent.ACTION_SEND).apply {

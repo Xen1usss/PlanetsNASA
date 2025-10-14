@@ -18,6 +18,7 @@ data class NasaData(
     val title: String?,
     val nasa_id: String?,
     val description: String?,
+    val description_508: String?,
     val date_created: String?
 )
 

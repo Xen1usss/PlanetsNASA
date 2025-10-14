@@ -33,17 +33,30 @@ class PlanetRepository(private val api: NasaImageApi) {
     suspend fun getById(nasaId: String): PlanetDetailUiModel? {
         val resp = api.searchByNasaId(nasaId)
         val item = resp.collection?.items.orEmpty().firstOrNull() ?: return null
-        val data = item.data?.firstOrNull()
-        val link = item.links?.firstOrNull { it.href?.isNotBlank() == true }?.href
-        val id = data?.nasa_id ?: return null
+        val data = item.data?.firstOrNull() ?: return null
+
+        val imageUrl = item.links?.firstOrNull { !it.href.isNullOrBlank() }?.href ?: return null
+        val id = data.nasa_id ?: return null
         val title = data.title ?: "Untitled"
-        val imageUrl = link ?: return null
+
+        // PlanetRepository.kt (в getById)
+        val rawDesc = when {
+            !data.description.isNullOrBlank() -> data.description
+            !data.description_508.isNullOrBlank() -> data.description_508
+            else -> null
+        }
+        val desc = rawDesc
+            ?.trim()
+            ?.takeIf { !it.equals(title, ignoreCase = true) } // ← не дублируем заголовок
+
+
         return PlanetDetailUiModel(
             id = id,
             title = title,
             imageUrl = imageUrl,
-            description = data.description,
+            description = desc,
             date = data.date_created
         )
     }
+
 }
