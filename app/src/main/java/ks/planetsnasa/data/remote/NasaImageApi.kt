@@ -12,4 +12,9 @@ interface NasaImageApi {
         @Query("media_type") mediaType: String = "image",
         @Query("page") page: Int = 1
     ): NasaSearchResponse
+
+    @GET("search")
+    suspend fun searchByNasaId(
+        @Query("nasa_id") nasaId: String
+    ): NasaSearchResponse
 }

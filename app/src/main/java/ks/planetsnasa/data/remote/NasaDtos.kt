@@ -16,7 +16,9 @@ data class NasaItem(
 
 data class NasaData(
     val title: String?,
-    val nasa_id: String?
+    val nasa_id: String?,
+    val description: String?,
+    val date_created: String?
 )
 
 data class NasaLink(

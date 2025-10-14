@@ -1,0 +1,42 @@
+package ks.planetsnasa.ui.detail
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import ks.planetsnasa.data.PlanetRepository
+import ks.planetsnasa.ui.model.PlanetDetailUiModel
+
+sealed interface PlanetDetailState {
+    data object Loading : PlanetDetailState
+    data class Content(val item: PlanetDetailUiModel) : PlanetDetailState
+    data class Error(val message: String) : PlanetDetailState
+}
+
+class PlanetDetailViewModel(
+    private val repo: PlanetRepository,
+    private val nasaId: String
+) : ViewModel() {
+
+    private val _state = MutableStateFlow<PlanetDetailState>(PlanetDetailState.Loading)
+    val state: StateFlow<PlanetDetailState> = _state
+
+    init {
+        refresh()
+    }
+
+    fun refresh() {
+        _state.value = PlanetDetailState.Loading
+        viewModelScope.launch {
+            runCatching { repo.getById(nasaId) }
+                .onSuccess { item ->
+                    if (item == null) _state.value = PlanetDetailState.Error("Not found")
+                    else _state.value = PlanetDetailState.Content(item)
+                }
+                .onFailure { e ->
+                    _state.value = PlanetDetailState.Error(e.message ?: "Unknown error")
+                }
+        }
+    }
+}

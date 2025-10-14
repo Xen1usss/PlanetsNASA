@@ -2,12 +2,10 @@ package ks.planetsnasa.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ks.planetsnasa.data.PlanetRepository
-import ks.planetsnasa.ui.fake.fakePlanets
 import ks.planetsnasa.ui.model.PlanetUiModel
 
 sealed interface PlanetListState {
