@@ -6,6 +6,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import ks.planetsnasa.data.PlanetRepository
 import ks.planetsnasa.ui.fake.fakePlanets
 import ks.planetsnasa.ui.model.PlanetUiModel
 
@@ -16,24 +17,26 @@ sealed interface PlanetListState {
     data class Error(val message: String) : PlanetListState
 }
 
-class PlanetListViewModel : ViewModel() {
+class PlanetListViewModel(
+    private val repo: PlanetRepository
+) : ViewModel() {
+
     private val _state = MutableStateFlow<PlanetListState>(PlanetListState.Loading)
     val state: StateFlow<PlanetListState> = _state
 
-    init {
-        // Имитация загрузки
-        viewModelScope.launch {
-            delay(600)
-            val items = fakePlanets
-            _state.value = if (items.isEmpty()) PlanetListState.Empty else PlanetListState.Content(items)
-        }
-    }
+    init { refresh() }
 
-    fun onRetry() {
+    fun refresh() {
         _state.value = PlanetListState.Loading
         viewModelScope.launch {
-            delay(400)
-            _state.value = PlanetListState.Content(fakePlanets)
+            runCatching { repo.loadPlanetsFirstPage() }
+                .onSuccess { items ->
+                    _state.value = if (items.isEmpty()) PlanetListState.Empty
+                    else PlanetListState.Content(items)
+                }
+                .onFailure { e ->
+                    _state.value = PlanetListState.Error(e.message ?: "Unknown error")
+                }
         }
     }
 }

@@ -20,27 +20,27 @@ fun PlanetListScreen(
 
     when (val s = state) {
         is PlanetListState.Loading -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
         is PlanetListState.Error -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Не удалось загрузить данные")
                     Spacer(Modifier.height(8.dp))
-                    Button(onClick = { viewModel.onRetry() }) { Text("Повторить") }
+                    Button(onClick = { viewModel.refresh() }) { Text("Повторить") }
                 }
             }
         }
         is PlanetListState.Empty -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Нет данных")
             }
         }
         is PlanetListState.Content -> {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = modifier.fillMaxSize(),
                 contentPadding = PaddingValues(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {

@@ -61,17 +61,17 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("androidx.compose.material3:material3:1.4.0")
+//    implementation("androidx.compose.material3:material3:1.4.0")
 
     // navigation-compose
-    implementation ("androidx.navigation:navigation-compose:2.9.3")
+    implementation ("androidx.navigation:navigation-compose:2.8.5")
 
     // DataStore
     implementation ("androidx.datastore:datastore-preferences:1.1.7")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
     // Serialization
     implementation("com.google.code.gson:gson:2.13.2")
@@ -81,4 +81,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("io.coil-kt:coil-compose:2.7.0")
+
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 }
