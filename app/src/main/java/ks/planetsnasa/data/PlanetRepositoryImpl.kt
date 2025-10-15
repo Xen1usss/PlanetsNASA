@@ -14,13 +14,12 @@ class PlanetRepositoryImpl @Inject constructor(
 ) : PlanetRepository {
 
     override suspend fun getPlanets(page: Int): List<Planet> {
-        // 1) пробуем кэш для этой страницы
+
         val cached = dao.getByPage(page)
         if (cached.isNotEmpty()) {
             return cached.map { it.toDomain() }
         }
 
-        // 2) сети нет в кэше → идём в сеть
         val resp = api.searchImages(query = "planet", page = page)
         val items = resp.collection?.items.orEmpty()
 
@@ -41,7 +40,6 @@ class PlanetRepositoryImpl @Inject constructor(
         }
 
         if (page == 1) {
-            // Полное обновление списка: очищаем и кладём первую страницу
             dao.clearAll()
         }
         if (toInsert.isNotEmpty()) {
@@ -52,7 +50,6 @@ class PlanetRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPlanetById(nasaId: String): PlanetDetail? {
-        // (оставляем как было — деталь без кэша, чтобы успеть в срок)
         val resp = api.searchByNasaId(nasaId)
         val item = resp.collection?.items.orEmpty().firstOrNull() ?: return null
         val data = item.data?.firstOrNull() ?: return null

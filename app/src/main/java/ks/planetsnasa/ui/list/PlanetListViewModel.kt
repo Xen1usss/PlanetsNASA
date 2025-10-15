@@ -36,7 +36,7 @@ class PlanetListViewModel @Inject constructor(
 
     fun refresh() {
         val current = state.value
-        // если уже есть контент — мягкий рефреш (оставляем список)
+
         if (current is PlanetListState.Content) {
             viewModelScope.launch {
                 _state.value = current.copy(refreshing = true)
@@ -52,7 +52,7 @@ class PlanetListViewModel @Inject constructor(
                 }
             }
         } else {
-            // первый запуск/после ошибки — обычная загрузка с экраном Loading
+
             page = 1
             endReached = false
             _state.value = PlanetListState.Loading

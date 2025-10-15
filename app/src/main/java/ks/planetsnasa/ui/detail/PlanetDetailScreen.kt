@@ -91,7 +91,6 @@ fun PlanetDetailScreen(onBack: () -> Unit) {
 
             Box(Modifier.fillMaxSize()) {
 
-                // 1) Хедер: изображение + градиент
                 Box {
                     SubcomposeAsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
@@ -133,7 +132,6 @@ fun PlanetDetailScreen(onBack: () -> Unit) {
                     )
                 }
 
-                // 2) Контент: не fillMaxSize, а через Spacer смещаем ниже картинки
                 Column(Modifier.fillMaxSize()) {
                     Spacer(Modifier.height(headerHeight - overlap)) // «подвинулось» под фото
                     Surface(

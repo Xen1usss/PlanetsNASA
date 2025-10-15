@@ -3,18 +3,19 @@ package ks.planetsnasa.data.local
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import androidx.room.Query
 
 @Dao
 interface PlanetDao {
 
-    @Query("SELECT * FROM planets WHERE page = :page ORDER BY rowid")
+    // используем полное имя аннотации, чтобы IDE точно взяла Room, поскольку был конфликт с похожим импортом из retrofit
+    @Suppress("AndroidUnresolvedRoomSqlReference")
+    @androidx.room.Query("SELECT * FROM planets WHERE page = :page ORDER BY id")
     suspend fun getByPage(page: Int): List<PlanetEntity>
 
-    @Query("SELECT COUNT(*) FROM planets")
+    @androidx.room.Query("SELECT COUNT(*) FROM planets")
     suspend fun countAll(): Int
 
-    @Query("DELETE FROM planets")
+    @androidx.room.Query("DELETE FROM planets")
     suspend fun clearAll()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

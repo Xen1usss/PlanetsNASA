@@ -85,11 +85,11 @@ fun PlanetListScreen(
                 LaunchedEffect(listState, s.items.size) {
                     snapshotFlow {
                         val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-                        // начинаем подгрузку, когда остаётся ~3 карточки до конца
+
                         lastVisible >= (s.items.lastIndex - 3)
                     }
                         .distinctUntilChanged()
-                        .filter { it }                      // берём только true
+                        .filter { it }
                         .collectLatest {
                             viewModel.loadNext()
                         }
@@ -108,7 +108,6 @@ fun PlanetListScreen(
                         )
                     }
 
-                    // футер подгрузки
                     if (s.loadingMore) {
                         item(key = "loading_more") {
                             Box(
@@ -123,7 +122,6 @@ fun PlanetListScreen(
                     }
                 }
 
-                // индикатор сверху по центру
                 PullRefreshIndicator(
                     refreshing = refreshing,
                     state = refreshState,

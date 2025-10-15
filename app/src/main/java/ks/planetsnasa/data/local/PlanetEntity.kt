@@ -8,6 +8,6 @@ data class PlanetEntity(
     @PrimaryKey val id: String,
     val title: String,
     val imageUrl: String,
-    val page: Int,           // для пагинации
-    val cachedAt: Long       // для будущей политики устаревания
+    val page: Int,
+    val cachedAt: Long
 )

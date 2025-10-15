@@ -36,7 +36,7 @@ fun PlanetCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box {
-            // 1) Картинка с одинаковым аспектом
+
             SubcomposeAsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(item.imageUrl)
@@ -65,7 +65,6 @@ fun PlanetCard(
                     .aspectRatio(16f / 9f)
             )
 
-            // 2) Градиент и заголовок поверх
             Box(
                 Modifier
                     .matchParentSize()
