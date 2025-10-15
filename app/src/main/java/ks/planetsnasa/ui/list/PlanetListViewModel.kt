@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import ks.planetsnasa.data.PlanetRepository
+import ks.planetsnasa.domain.usecase.GetPlanetsPageUseCase
 import ks.planetsnasa.ui.model.PlanetUiModel
 import javax.inject.Inject
 
@@ -18,7 +18,7 @@ sealed interface PlanetListState {
 }
 @HiltViewModel
 class PlanetListViewModel @Inject constructor(
-    private val repo: PlanetRepository
+    private val getPlanetsPage: GetPlanetsPageUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<PlanetListState>(PlanetListState.Loading)
@@ -27,12 +27,22 @@ class PlanetListViewModel @Inject constructor(
     init { refresh() }
 
     fun refresh() {
+        // первый старт — Loading, дальше можно сделать «мягкий рефреш»
         _state.value = PlanetListState.Loading
         viewModelScope.launch {
-            runCatching { repo.loadPlanetsFirstPage() }
-                .onSuccess { items ->
-                    _state.value = if (items.isEmpty()) PlanetListState.Empty
-                    else PlanetListState.Content(items)
+            runCatching { getPlanetsPage(page = 1) }
+                .map { list ->
+                    list.map { d ->
+                        PlanetUiModel(
+                            id = d.id,
+                            name = d.title,
+                            imageUrl = d.imageUrl
+                        )
+                    }
+                }
+                .onSuccess { ui ->
+                    _state.value = if (ui.isEmpty()) PlanetListState.Empty
+                    else PlanetListState.Content(ui)
                 }
                 .onFailure { e ->
                     _state.value = PlanetListState.Error(e.message ?: "Unknown error")

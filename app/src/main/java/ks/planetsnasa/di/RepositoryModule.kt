@@ -1,19 +1,18 @@
 package ks.planetsnasa.di
 
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ks.planetsnasa.data.PlanetRepository
-import ks.planetsnasa.data.remote.NasaImageApi
+import ks.planetsnasa.data.PlanetRepositoryImpl
+import ks.planetsnasa.domain.repository.PlanetRepository
 import javax.inject.Singleton
+
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RepositoryModule {
-
-    @Provides
+abstract class RepositoryModule {
+    @Binds
     @Singleton
-    fun providePlanetRepository(api: NasaImageApi): PlanetRepository =
-        PlanetRepository(api)
+    abstract fun bindPlanetRepository(impl: PlanetRepositoryImpl): PlanetRepository
 }

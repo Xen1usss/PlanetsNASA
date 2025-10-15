@@ -7,7 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import ks.planetsnasa.data.PlanetRepository
+import ks.planetsnasa.domain.usecase.GetPlanetByIdUseCase
 import ks.planetsnasa.ui.model.PlanetDetailUiModel
 import javax.inject.Inject
 
@@ -19,7 +19,7 @@ sealed interface PlanetDetailState {
 
 @HiltViewModel
 class PlanetDetailViewModel @Inject constructor(
-    private val repo: PlanetRepository,
+    private val getPlanetById: GetPlanetByIdUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -35,10 +35,21 @@ class PlanetDetailViewModel @Inject constructor(
     fun refresh() {
         _state.value = PlanetDetailState.Loading
         viewModelScope.launch {
-            runCatching { repo.getById(nasaId) }
-                .onSuccess { item ->
-                    if (item == null) _state.value = PlanetDetailState.Error("Not found")
-                    else _state.value = PlanetDetailState.Content(item)
+            runCatching { getPlanetById(nasaId) }
+                .map { d ->
+                    d?.let {
+                        PlanetDetailUiModel(
+                            id = it.id,
+                            title = it.title,
+                            imageUrl = it.imageUrl,
+                            description = it.description,
+                            date = it.dateIso
+                        )
+                    }
+                }
+                .onSuccess { ui ->
+                    if (ui == null) _state.value = PlanetDetailState.Error("Not found")
+                    else _state.value = PlanetDetailState.Content(ui)
                 }
                 .onFailure { e ->
                     _state.value = PlanetDetailState.Error(e.message ?: "Unknown error")
