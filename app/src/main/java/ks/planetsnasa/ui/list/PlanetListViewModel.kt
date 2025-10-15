@@ -12,7 +12,10 @@ import javax.inject.Inject
 
 sealed interface PlanetListState {
     data object Loading : PlanetListState
-    data class Content(val items: List<PlanetUiModel>) : PlanetListState
+    data class Content(
+        val items: List<PlanetUiModel>,
+        val loadingMore: Boolean = false
+    ) : PlanetListState
     data object Empty : PlanetListState
     data class Error(val message: String) : PlanetListState
 }
@@ -24,29 +27,56 @@ class PlanetListViewModel @Inject constructor(
     private val _state = MutableStateFlow<PlanetListState>(PlanetListState.Loading)
     val state: StateFlow<PlanetListState> = _state
 
+    private var page = 1
+    private var endReached = false
+    private var loadingMore = false
+
     init { refresh() }
 
     fun refresh() {
-        // первый старт — Loading, дальше можно сделать «мягкий рефреш»
+        page = 1
+        endReached = false
         _state.value = PlanetListState.Loading
+
         viewModelScope.launch {
-            runCatching { getPlanetsPage(page = 1) }
-                .map { list ->
-                    list.map { d ->
-                        PlanetUiModel(
-                            id = d.id,
-                            name = d.title,
-                            imageUrl = d.imageUrl
-                        )
-                    }
-                }
-                .onSuccess { ui ->
-                    _state.value = if (ui.isEmpty()) PlanetListState.Empty
-                    else PlanetListState.Content(ui)
-                }
-                .onFailure { e ->
-                    _state.value = PlanetListState.Error(e.message ?: "Unknown error")
-                }
+            try {
+                val domain = getPlanetsPage(page = page)
+                val ui = domain.map { d -> PlanetUiModel(d.id, d.title, d.imageUrl) }
+                _state.value = if (ui.isEmpty()) PlanetListState.Empty
+                else PlanetListState.Content(items = ui, loadingMore = false)
+            } catch (e: Throwable) {
+                _state.value = PlanetListState.Error(e.message ?: "Unknown error")
+            }
         }
     }
+
+    fun loadNext() {
+        val current = state.value as? PlanetListState.Content ?: return
+        if (loadingMore || endReached) return
+
+        loadingMore = true
+        _state.value = current.copy(loadingMore = true)
+
+        viewModelScope.launch {
+            try {
+                val next = getPlanetsPage(page = page + 1)
+                if (next.isEmpty()) {
+                    endReached = true
+                    _state.value = current.copy(loadingMore = false)
+                } else {
+                    page += 1
+                    val appended = next.map { d -> PlanetUiModel(d.id, d.title, d.imageUrl) }
+                    _state.value = current.copy(
+                        items = current.items + appended,
+                        loadingMore = false
+                    )
+                }
+            } catch (_: Throwable) {
+                _state.value = current.copy(loadingMore = false)
+            } finally {
+                loadingMore = false
+            }
+        }
+    }
+
 }

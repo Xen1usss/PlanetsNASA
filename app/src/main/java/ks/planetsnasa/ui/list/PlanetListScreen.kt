@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -17,11 +20,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -33,6 +41,9 @@ fun PlanetListScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     when (val s = state) {
+
+
+
         is PlanetListState.Loading -> {
             Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
@@ -57,26 +68,58 @@ fun PlanetListScreen(
 
         is PlanetListState.Content -> {
 
-            // Пока VM переключает состояние на Loading при refresh(),
-            // индикатор сверху будет показываться, но контент пропадать.
-            // Это ок как первый шаг.
             val refreshing = state is PlanetListState.Loading
             val refreshState = rememberPullRefreshState(
                 refreshing = refreshing,
                 onRefresh = { viewModel.refresh() }
             )
 
+            val listState = rememberLazyListState()
+
             Box(
                 modifier = modifier
                     .fillMaxSize()
                     .pullRefresh(refreshState)
             ) {
+
+                LaunchedEffect(listState, s.items.size) {
+                    snapshotFlow {
+                        val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                        // начинаем подгрузку, когда остаётся ~3 карточки до конца
+                        lastVisible >= (s.items.lastIndex - 3)
+                    }
+                        .distinctUntilChanged()
+                        .filter { it }                      // берём только true
+                        .collectLatest {
+                            viewModel.loadNext()
+                        }
+                }
+
                 LazyColumn(
+                    state = listState,
+                    modifier = modifier.fillMaxSize(),
                     contentPadding = PaddingValues(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(s.items, key = { it.id }) { item ->
-                        PlanetCard(item = item, onClick = { onPlanetClick(item.id) })
+                        PlanetCard(
+                            item = item,
+                            onClick = { onPlanetClick(item.id) }
+                        )
+                    }
+
+                    // футер подгрузки
+                    if (s.loadingMore) {
+                        item(key = "loading_more") {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
                     }
                 }
 
