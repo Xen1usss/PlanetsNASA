@@ -24,20 +24,21 @@ class PlanetRepositoryImpl @Inject constructor(
         val items = resp.collection?.items.orEmpty()
 
         val now = System.currentTimeMillis()
-        val toInsert = items.mapNotNull { item ->
-            val data = item.data?.firstOrNull() ?: return@mapNotNull null
-            val title = data.title?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
-            val imageUrl =
-                item.links?.firstOrNull { !it.href.isNullOrBlank() }?.href ?: return@mapNotNull null
+
+        val toInsert = items.mapIndexed { idx, item ->
+            val data = item.data?.firstOrNull() ?: return@mapIndexed null
+            val title = data.title?.takeIf { it.isNotBlank() } ?: return@mapIndexed null
+            val imageUrl = item.links?.firstOrNull { !it.href.isNullOrBlank() }?.href ?: return@mapIndexed null
             val id = data.nasa_id ?: title
             PlanetEntity(
                 id = id,
                 title = title,
                 imageUrl = imageUrl,
                 page = page,
+                indexInPage = idx,
                 cachedAt = now
             )
-        }
+        }.filterNotNull()
 
         if (page == 1) {
             dao.clearAll()

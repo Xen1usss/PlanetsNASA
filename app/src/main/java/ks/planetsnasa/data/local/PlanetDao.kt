@@ -7,9 +7,7 @@ import androidx.room.OnConflictStrategy
 @Dao
 interface PlanetDao {
 
-    // используем полное имя аннотации, чтобы IDE точно взяла Room, поскольку был конфликт с похожим импортом из retrofit
-    @Suppress("AndroidUnresolvedRoomSqlReference")
-    @androidx.room.Query("SELECT * FROM planets WHERE page = :page ORDER BY id")
+    @androidx.room.Query("SELECT * FROM planets WHERE page = :page ORDER BY indexInPage")
     suspend fun getByPage(page: Int): List<PlanetEntity>
 
     @androidx.room.Query("SELECT COUNT(*) FROM planets")

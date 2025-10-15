@@ -9,5 +9,6 @@ data class PlanetEntity(
     val title: String,
     val imageUrl: String,
     val page: Int,
+    val indexInPage: Int,
     val cachedAt: Long
 )
