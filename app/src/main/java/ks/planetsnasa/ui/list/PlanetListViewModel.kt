@@ -14,6 +14,7 @@ sealed interface PlanetListState {
     data object Loading : PlanetListState
     data class Content(
         val items: List<PlanetUiModel>,
+        val refreshing: Boolean = false,
         val loadingMore: Boolean = false
     ) : PlanetListState
     data object Empty : PlanetListState
@@ -34,18 +35,36 @@ class PlanetListViewModel @Inject constructor(
     init { refresh() }
 
     fun refresh() {
-        page = 1
-        endReached = false
-        _state.value = PlanetListState.Loading
-
-        viewModelScope.launch {
-            try {
-                val domain = getPlanetsPage(page = page)
-                val ui = domain.map { d -> PlanetUiModel(d.id, d.title, d.imageUrl) }
-                _state.value = if (ui.isEmpty()) PlanetListState.Empty
-                else PlanetListState.Content(items = ui, loadingMore = false)
-            } catch (e: Throwable) {
-                _state.value = PlanetListState.Error(e.message ?: "Unknown error")
+        val current = state.value
+        // если уже есть контент — мягкий рефреш (оставляем список)
+        if (current is PlanetListState.Content) {
+            viewModelScope.launch {
+                _state.value = current.copy(refreshing = true)
+                try {
+                    page = 1
+                    endReached = false
+                    val domain = getPlanetsPage(page = page)
+                    val ui = domain.map { d -> PlanetUiModel(d.id, d.title, d.imageUrl) }
+                    _state.value = if (ui.isEmpty()) PlanetListState.Empty
+                    else PlanetListState.Content(items = ui, refreshing = false)
+                } catch (e: Throwable) {
+                    _state.value = current.copy(refreshing = false) // оставить старый контент
+                }
+            }
+        } else {
+            // первый запуск/после ошибки — обычная загрузка с экраном Loading
+            page = 1
+            endReached = false
+            _state.value = PlanetListState.Loading
+            viewModelScope.launch {
+                try {
+                    val domain = getPlanetsPage(page = page)
+                    val ui = domain.map { d -> PlanetUiModel(d.id, d.title, d.imageUrl) }
+                    _state.value = if (ui.isEmpty()) PlanetListState.Empty
+                    else PlanetListState.Content(items = ui, refreshing = false)
+                } catch (e: Throwable) {
+                    _state.value = PlanetListState.Error(e.message ?: "Unknown error")
+                }
             }
         }
     }

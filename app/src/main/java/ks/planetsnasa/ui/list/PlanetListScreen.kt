@@ -68,7 +68,7 @@ fun PlanetListScreen(
 
         is PlanetListState.Content -> {
 
-            val refreshing = state is PlanetListState.Loading
+            val refreshing = s.refreshing
             val refreshState = rememberPullRefreshState(
                 refreshing = refreshing,
                 onRefresh = { viewModel.refresh() }
