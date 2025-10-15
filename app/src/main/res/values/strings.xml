@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">PlanetsNASA</string>
+
+    <!-- Общие -->
+    <string name="error_generic">Не удалось загрузить данные</string>
+    <string name="action_retry">Повторить</string>
+    <string name="empty_list">Нет данных</string>
+    <string name="loading_more">Загружаем ещё…</string>
+    <string name="end_of_list">Конец списка</string>
+
+    <!-- Навигация/доступность -->
+    <string name="nav_back_cd">Назад</string>
+
+    <!-- Детальный экран -->
+    <string name="action_share">Поделиться</string>
+    <string name="action_save">Сохранить</string>
+    <string name="share_chooser_title">Поделиться</string>
+
+    <!-- Формат даты (если где-то понадобится как строка) -->
+    <string name="date_pattern_pretty">d MMM uuuu</string>
 </resources>

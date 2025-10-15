@@ -64,8 +64,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-//    implementation("androidx.compose.material3:material3:1.4.0")
-
     // navigation-compose
     implementation ("androidx.navigation:navigation-compose:2.8.5")
 
@@ -79,29 +77,37 @@ dependencies {
     // Serialization
     implementation("com.google.code.gson:gson:2.13.2")
 
+    // navigation
     implementation("com.google.accompanist:accompanist-navigation-animation:0.36.0")
 
-    implementation("androidx.compose.material:material-icons-extended")
-
+    // coil
     implementation("io.coil-kt:coil-compose:2.7.0")
 
+    // retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
+    // okhttp
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
+    // swiperefresh
     implementation("com.google.accompanist:accompanist-swiperefresh:0.36.0")
 
+    // material
     implementation("androidx.compose.material:material")
 
+    // hilt
     implementation("com.google.dagger:hilt-android:${libs.versions.hilt.get()}")
     kapt("com.google.dagger:hilt-compiler:${libs.versions.hilt.get()}")
 
     // Для hiltViewModel() в Compose
     implementation("androidx.hilt:hilt-navigation-compose:${libs.versions.hiltNavCompose.get()}")
 
+    // other
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    implementation("androidx.compose.material:material-icons-extended")
 
+    // room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")

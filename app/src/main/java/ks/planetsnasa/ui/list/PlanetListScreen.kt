@@ -30,6 +30,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import androidx.compose.ui.res.stringResource
+import ks.planetsnasa.R
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -53,16 +55,16 @@ fun PlanetListScreen(
         is PlanetListState.Error -> {
             Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Не удалось загрузить данные")
+                    Text(stringResource(R.string.error_generic))
                     Spacer(Modifier.height(8.dp))
-                    Button(onClick = { viewModel.refresh() }) { Text("Повторить") }
+                    Button(onClick = { viewModel.refresh() }) { Text(stringResource(R.string.action_retry)) }
                 }
             }
         }
 
         is PlanetListState.Empty -> {
             Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Нет данных")
+                Text(stringResource(R.string.empty_list))
             }
         }
 

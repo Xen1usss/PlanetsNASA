@@ -49,6 +49,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import ks.planetsnasa.ui.util.formatIsoToLocalOrSelf
+import androidx.compose.ui.res.stringResource
+import ks.planetsnasa.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -170,15 +172,15 @@ fun PlanetDetailScreen(onBack: () -> Unit) {
                     },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад", tint = Color.White)
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.nav_back_cd))
                         }
                     },
                     actions = {
                         IconButton(onClick = { share(ctx, item.title, item.imageUrl) }) {
-                            Icon(Icons.Filled.Share, contentDescription = "Поделиться", tint = Color.White)
+                            Icon(Icons.Filled.Share, contentDescription = stringResource(R.string.action_share))
                         }
                         IconButton(onClick = { saveWithDownloadManager(ctx, item.title, item.imageUrl) }) {
-                            Icon(Icons.Filled.Download, contentDescription = "Сохранить", tint = Color.White)
+                            Icon(Icons.Filled.Download, contentDescription = stringResource(R.string.action_save))
                         }
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -202,7 +204,7 @@ private fun share(ctx: Context, title: String, url: String) {
         putExtra(Intent.EXTRA_SUBJECT, title)
         putExtra(Intent.EXTRA_TEXT, "$title\n$url")
     }
-    ctx.startActivity(Intent.createChooser(intent, "Поделиться"))
+    ctx.startActivity(Intent.createChooser(intent, ctx.getString(R.string.share_chooser_title)))
 }
 
 private fun saveWithDownloadManager(ctx: Context, title: String, url: String) {
