@@ -20,6 +20,7 @@ sealed interface PlanetListState {
     data object Empty : PlanetListState
     data class Error(val message: String) : PlanetListState
 }
+
 @HiltViewModel
 class PlanetListViewModel @Inject constructor(
     private val getPlanetsPage: GetPlanetsPageUseCase
@@ -40,31 +41,38 @@ class PlanetListViewModel @Inject constructor(
         if (current is PlanetListState.Content) {
             viewModelScope.launch {
                 _state.value = current.copy(refreshing = true)
+
+                val started = System.currentTimeMillis()
                 try {
                     page = 1
                     endReached = false
                     val domain = getPlanetsPage(page = page)
-                    val ui = domain.map { d -> PlanetUiModel(d.id, d.title, d.imageUrl) }
+                    val ui = domain.map { PlanetUiModel(it.id, it.title, it.imageUrl) }
+
+                    val elapsed = System.currentTimeMillis() - started
+                    val minSpin = 400L
+                    if (elapsed < minSpin) kotlinx.coroutines.delay(minSpin - elapsed)
+
                     _state.value = if (ui.isEmpty()) PlanetListState.Empty
                     else PlanetListState.Content(items = ui, refreshing = false)
-                } catch (e: Throwable) {
-                    _state.value = current.copy(refreshing = false) // оставить старый контент
+                } catch (_: Throwable) {
+                    _state.value = current.copy(refreshing = false) // оставляем старый контент
                 }
             }
-        } else {
+            return
+        }
 
-            page = 1
-            endReached = false
-            _state.value = PlanetListState.Loading
-            viewModelScope.launch {
-                try {
-                    val domain = getPlanetsPage(page = page)
-                    val ui = domain.map { d -> PlanetUiModel(d.id, d.title, d.imageUrl) }
-                    _state.value = if (ui.isEmpty()) PlanetListState.Empty
-                    else PlanetListState.Content(items = ui, refreshing = false)
-                } catch (e: Throwable) {
-                    _state.value = PlanetListState.Error(e.message ?: "Unknown error")
-                }
+        // первая загрузка (когда ещё нет контента)
+        _state.value = PlanetListState.Loading
+        viewModelScope.launch {
+            try {
+                page = 1
+                endReached = false
+                val ui = getPlanetsPage(page).map { PlanetUiModel(it.id, it.title, it.imageUrl) }
+                _state.value = if (ui.isEmpty()) PlanetListState.Empty
+                else PlanetListState.Content(items = ui)
+            } catch (e: Throwable) {
+                _state.value = PlanetListState.Error(e.message ?: "Unknown error")
             }
         }
     }
@@ -84,7 +92,7 @@ class PlanetListViewModel @Inject constructor(
                     _state.value = current.copy(loadingMore = false)
                 } else {
                     page += 1
-                    val appended = next.map { d -> PlanetUiModel(d.id, d.title, d.imageUrl) }
+                    val appended = next.map { PlanetUiModel(it.id, it.title, it.imageUrl) }
                     _state.value = current.copy(
                         items = current.items + appended,
                         loadingMore = false
@@ -97,5 +105,4 @@ class PlanetListViewModel @Inject constructor(
             }
         }
     }
-
 }
