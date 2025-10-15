@@ -48,6 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import ks.planetsnasa.ui.util.formatIsoToLocalOrSelf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -150,7 +151,7 @@ fun PlanetDetailScreen(onBack: () -> Unit) {
                             item.date?.let {
                                 Spacer(Modifier.height(6.dp))
                                 Text(
-                                    text = it,
+                                    text = it.formatIsoToLocalOrSelf(),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

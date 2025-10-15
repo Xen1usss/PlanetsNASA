@@ -31,6 +31,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -98,5 +99,7 @@ dependencies {
 
     // Для hiltViewModel() в Compose
     implementation("androidx.hilt:hilt-navigation-compose:${libs.versions.hiltNavCompose.get()}")
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
 }
